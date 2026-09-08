@@ -385,7 +385,8 @@
 
 
 
-
+//v5.1
+import CommentSection from '../components/CommentSection';
 
 //v5
 import React, { useState, useEffect } from 'react';
@@ -667,6 +668,10 @@ const ResourceDetail = () => {
           )}
         </div>
       </div>
+
+          
+<CommentSection resourceId={id} />
+
     </div>
   );
 };

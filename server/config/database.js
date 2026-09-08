@@ -2,18 +2,14 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        // Your connection string
-        const URI = "mongodb+srv://rafi:rafi1234@rafidb.q3wmjqb.mongodb.net/nuralcampus";
-        
-        // Your options
-        const OPTIONS = {
-            user: 'rafi',
-            pass: 'rafi1234',
-            autoIndex: true,
-        };
+        const URI = process.env.MONGODB_URI;
+
+        if (!URI) {
+            throw new Error('MONGODB_URI is not configured');
+        }
         
         // Connect to database
-        await mongoose.connect(URI, OPTIONS);
+        await mongoose.connect(URI, { autoIndex: true });
         
         console.log('✅ MongoDB Atlas Connected Successfully');
         console.log('📚 Database Name:', mongoose.connection.db.databaseName);

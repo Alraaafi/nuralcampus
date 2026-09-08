@@ -20,9 +20,9 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">Developer Contact</h3>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-blue-400"><FaGithub size={24} /></a>
-              <a href="#" className="hover:text-blue-400"><FaLinkedin size={24} /></a>
-              <a href="mailto:contact@nuralcampus.com" className="hover:text-blue-400"><FaEnvelope size={24} /></a>
+              <a href="https://github.com/alraaafi/" className="hover:text-blue-400"><FaGithub size={24} /></a>
+              <a href="https://www.linkedin.com/in/alraaafi" className="hover:text-blue-400"><FaLinkedin size={24} /></a>
+              <a href="mailto:rafi122283pro@gmail.com" className="hover:text-blue-400"><FaEnvelope size={24} /></a>
             </div>
           </div>
 
@@ -33,12 +33,12 @@ const Footer = () => {
               NuralCampus provides intelligent academic resource management for students and educators.
             </p>
             <p className="text-sm mt-2">
-              Made with <FaHeart className="inline text-red-500" /> for Education
+              Made For <FaHeart className="inline text-red-500" /> Easy Learning.
             </p>
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-4 text-center">
-          <p>&copy; 2024 NuralCampus. All rights reserved.</p>
+          <p>&copy; 2026 NuralCampus. All rights reserved.</p>
         </div>
       </div>
     </footer>

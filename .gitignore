@@ -1,0 +1,14 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor settings
+.vscode/
+
+# Dependencies and build output
+node_modules/
+dist/
+
+# Runtime uploads (Cloudinary is now the production media store)
+server/uploads/

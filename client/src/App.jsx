@@ -15,23 +15,42 @@ import UserProfile from './pages/UserProfile';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return Boolean(localStorage.getItem('token') && localStorage.getItem('user'));
+  });
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
+  });
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check for existing token on app load
     const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-
-    if (token && userData) {
-      // Set axios default header
+    if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
     }
-    setLoading(false);
+
+  }, []);
+
+  useEffect(() => {
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          delete axios.defaults.headers.common['Authorization'];
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => axios.interceptors.response.eject(responseInterceptor);
   }, []);
 
 
@@ -50,17 +69,6 @@ function App() {
     setIsAuthenticated(false);
     setUser(null);
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={darkMode ? 'dark' : ''}>

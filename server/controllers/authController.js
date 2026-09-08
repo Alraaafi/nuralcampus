@@ -3,6 +3,8 @@ const Analytics = require('../models/Analytics');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
 exports.register = async (req, res) => {
     try {
         const { fullName, email, username, password, institute, department } = req.body;
@@ -39,7 +41,7 @@ exports.register = async (req, res) => {
         // Create token
         const token = jwt.sign(
             { userId: user._id, username: user.username },
-            'your_jwt_secret_key_change_this',
+            JWT_SECRET,
             { expiresIn: '7d' }
         );
         
@@ -65,7 +67,7 @@ exports.login = async (req, res) => {
         
         const token = jwt.sign(
             { userId: user._id, username: user.username },
-            'your_jwt_secret_key_change_this',
+            JWT_SECRET,
             { expiresIn: '7d' }
         );
         

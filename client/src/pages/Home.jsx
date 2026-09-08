@@ -589,7 +589,8 @@
 
 
 
-
+//v5.1
+import FeedbackSection from '../components/FeedbackSection';
 
 //v5
 import React, { useState, useEffect } from 'react';
@@ -604,6 +605,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import 'swiper/css/effect-fade';
+
 
 const Home = () => {
   const [stats, setStats] = useState({
@@ -935,6 +937,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      
 
       {/* Add global styles for dark mode */}
       <style jsx>{`
@@ -1010,7 +1013,13 @@ const Home = () => {
           opacity: 1;
         }
       `}</style>
+
+        
+      <FeedbackSection />
+
+
     </div>
+    
   );
 };
 

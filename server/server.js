@@ -72,7 +72,25 @@
 
 
 
-//v1
+//v1.1 - Added Feedback System
+
+const path = require('path');
+
+// Load environment variables before importing any route or middleware module.
+require('dotenv').config({
+    path: path.join(__dirname, '.env')
+});
+
+// Add with other route imports
+const feedbackRoutes = require('./routes/feedbackRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+
+// Add with other route uses
+
+
+
+
+//v1.0
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -80,40 +98,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-require('dotenv').config();
 
 const connectDB = require('./config/database');
+const { uploadBuffer } = require('./config/cloudinary');
 
 const app = express();
 
 // Connect to Database
 connectDB();
 
-// Ensure uploads directory exists
-const uploadsDir = './uploads';
-if (!fs.existsSync(uploadsDir)){
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const allowedTypes = /^image\/(jpeg|jpg|png|gif|webp)$/;
     const mimetype = allowedTypes.test(file.mimetype);
     
-    if (mimetype && extname) {
+    if (mimetype) {
         return cb(null, true);
     } else {
         cb(new Error('Only image files are allowed'));
@@ -121,7 +119,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({ 
-    storage: storage,
+    storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: fileFilter
 });
@@ -129,7 +127,6 @@ const upload = multer({
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
 
 // Rate limiting
 // Rate limiting - Increased limits
@@ -154,56 +151,19 @@ const userRoutes = require('./routes/userRoutes');
 
 
 
-// Add this after your existing multer configuration
-
-// Configure multer for resource cover images
-const resourceStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/resources/')
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'cover-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
-const resourceFileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-        return cb(null, true);
-    } else {
-        cb(new Error('Only image files are allowed for cover'));
-    }
-};
-
-const uploadResourceCover = multer({ 
-    storage: resourceStorage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-    fileFilter: resourceFileFilter
-});
-
-// Create resources directory if it doesn't exist
-const resourcesDir = './uploads/resources';
-if (!fs.existsSync(resourcesDir)){
-    fs.mkdirSync(resourcesDir, { recursive: true });
-}
-
 // New route for uploading resource cover image
-app.post('/api/upload-resource-cover', authMiddleware, uploadResourceCover.single('coverImage'), async (req, res) => {
+app.post('/api/upload-resource-cover', authMiddleware, upload.single('coverImage'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
-        
-        const imageUrl = `http://localhost:5000/uploads/resources/${req.file.filename}`;
+
+        const result = await uploadBuffer(req.file.buffer, 'nuralcampus/resource-covers');
         
         res.json({ 
             success: true, 
             message: 'Cover image uploaded successfully',
-            coverUrl: imageUrl
+            coverUrl: result.secure_url
         });
         
     } catch (error) {
@@ -223,7 +183,8 @@ app.post('/api/upload-profile-pic', authMiddleware, upload.single('profilePic'),
             return res.status(400).json({ message: 'No file uploaded' });
         }
         
-        const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+        const result = await uploadBuffer(req.file.buffer, 'nuralcampus/profile-pictures');
+        const imageUrl = result.secure_url;
         console.log('Image URL to save:', imageUrl);
         console.log('User ID:', req.user.userId);
         
@@ -271,6 +232,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/users', userRoutes);
+
+
+// Add this line to use feedback routes and comment routes
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/comments', commentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
