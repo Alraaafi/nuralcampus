@@ -21,7 +21,7 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4">Developer Contact</h3>
             <div className="flex space-x-4">
               <a href="https://github.com/alraaafi/" className="hover:text-blue-400"><FaGithub size={24} /></a>
-              <a href="https://www.linkedin.com/in/alraaafi" className="hover:text-blue-400"><FaLinkedin size={24} /></a>
+              <a href="https://www.linkedin.com/in/alraafi/" className="hover:text-blue-400" target="_blank" rel="noreferrer"><FaLinkedin size={24} /></a>
               <a href="mailto:rafi122283pro@gmail.com" className="hover:text-blue-400"><FaEnvelope size={24} /></a>
             </div>
           </div>
@@ -34,6 +34,9 @@ const Footer = () => {
             </p>
             <p className="text-sm mt-2">
               Made For <FaHeart className="inline text-red-500" /> Easy Learning.
+            </p>
+            <p className="text-sm mt-2">
+              Project Owner: Md. Tanvir Ahmed (Alraaafi) - CSE, JSTU
             </p>
           </div>
         </div>
